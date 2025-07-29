@@ -600,22 +600,25 @@ export default function Error({
 
 ### Testing Patterns
 
+
 #### Component Testing
 
-- Use a testing library like React Testing Library or Jest for unit and integration tests.
+- Use [Vitest](https://vitest.dev/) as the default test runner for all unit and integration tests.
+- Use React Testing Library for component rendering and interaction.
 - Mock external dependencies (e.g., API calls) to isolate component behavior.
 - Write tests for different states (loading, error, success) to ensure proper handling.
 
 ```ts
 // __tests__/components/user-profile.test.tsx
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { describe, it, expect } from 'vitest'
 import { UserProfile } from '@/components/user-profile'
 
 describe('UserProfile', () => {
   it('renders user information correctly', () => {
     const user = { name: 'John Doe', email: 'john@example.com' }
     render(<UserProfile user={user} />)
-    
     expect(screen.getByText('John Doe')).toBeInTheDocument()
     expect(screen.getByText('john@example.com')).toBeInTheDocument()
   })
