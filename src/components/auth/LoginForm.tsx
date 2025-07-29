@@ -47,16 +47,60 @@ export function LoginForm() {
     if (signInError) {
       setError(signInError.message)
     } else {
-      window.location.href = "/auth/profile"
+      // Successful login
+      // Check if user profile exists, create if missing
+      const { data: sessionData } = await supabase.auth.getSession()
+      const authUser = sessionData?.session?.user
+      if (authUser?.id) {
+        // Try to fetch user profile from users table
+        const { data: userProfile, error: userProfileError } = await supabase
+          .from('users')
+          .select('id')
+          .eq('id', authUser.id)
+          .maybeSingle()
+        if (!userProfile) {
+          // Check if username is taken by another user
+          let usernameToUse = authUser.user_metadata?.username || ''
+          if (usernameToUse) {
+            const { data: existingUser } = await supabase
+              .from('users')
+              .select('id')
+              .eq('username', usernameToUse)
+              .neq('id', authUser.id)
+              .maybeSingle()
+            if (existingUser) {
+              // Username is taken, use email as username
+              usernameToUse = authUser.email
+            }
+          }
+          // Insert user profile with unique username
+          const { error: dbError } = await supabase
+            .from('users')
+            .insert({
+              id: authUser.id,
+              username: usernameToUse,
+              email: authUser.email,
+              age_group: authUser.user_metadata?.age_group || '',
+            })
+          if (dbError) {
+            // If error is duplicate key, fetch existing profile and continue
+            if (dbError.message.includes('duplicate key value violates unique constraint')) {
+              // Profile exists, continue
+            } else {
+              setError('Logged in, but failed to create user profile. Please contact support. ' + dbError.message)
+              return
+            }
+          }
+        }
+      }
+      window.location.href = '/dashboard'
     }
   }
 
+  // ...existing code...
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-6 max-w-md mx-auto p-4"
-      >
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         <FormField
           control={form.control}
           name="email"

@@ -2,6 +2,7 @@
 
 import { Vortex } from "@/components/ui/vortex";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export default function Home() {
   return (
@@ -17,13 +18,12 @@ export default function Home() {
           An interactive web app teaching kids AI prompt engineering through biblical stories.<br />
           Gamified, safe, and fun!
         </p>
-        <div className="flex flex-col sm:flex-row items-center gap-4 mt-2">
-          <Link
-            href="/auth/register"
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 transition duration-200 rounded-lg text-white shadow-[0px_2px_0px_0px_#FFFFFF40_inset]"
-          >
-            Get Started
-          </Link>
+                <div className="flex flex-col sm:flex-row items-center gap-4 mt-2">
+                    <Link href="/auth/register">
+                        <Button size="lg" className="px-4 py-2 bg-blue-600 hover:bg-blue-700 transition duration-200 rounded-lg text-white shadow-[0px_2px_0px_0px_#FFFFFF40_inset]">
+                            Get Started
+                        </Button>
+                    </Link>
           <Link
             href="/auth/login"
             className="px-4 py-2 bg-white/10 hover:bg-white/20 transition duration-200 rounded-lg text-white text-lg font-semibold border border-white/20"

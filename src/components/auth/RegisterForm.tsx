@@ -56,7 +56,28 @@ export function RegisterForm() {
     if (signUpError) {
       setError(signUpError.message)
     } else {
-      // Optionally redirect or show success message
+      // Wait for session to be established, then insert user profile
+      const { data: sessionData } = await supabase.auth.getSession()
+      if (sessionData?.session?.user?.id) {
+        const authUser = sessionData.session.user
+        const { error: dbError } = await supabase
+          .from('users')
+          .insert({
+            id: authUser.id,
+            username: values.username,
+            email: values.email,
+            age_group: values.age_group,
+          })
+        if (dbError) {
+          setError('Account created, but failed to save profile. Please contact support. ' + dbError.message)
+        } else {
+          // Show success notification and redirect to login
+          alert('Registration successful! Please check your email to verify your account.')
+          window.location.href = '/auth/login'
+        }
+      } else {
+        setError('Account created, but could not retrieve user ID. Please log in and try again.')
+      }
     }
   }
 

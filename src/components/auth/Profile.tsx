@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
-import { Button } from "@/components/ui/button"
 import { LogoutButton } from "@/components/auth/LogoutButton"
 
 interface UserProfile {
@@ -21,7 +20,6 @@ export function Profile() {
       const supabase = createClient()
       const {
         data: { user },
-        error,
       } = await supabase.auth.getUser()
       if (user) {
         setUser({
