@@ -1,15 +1,12 @@
 import { createClient } from '@/lib/supabase/server'
 
-interface PageProps {
-  params: { [key: string]: string }
-  searchParams: { [key: string]: string | string[] | undefined }
-}
+// Remove explicit PageProps type to avoid type mismatch with Next.js App Router
 
 /**
  * Test page to verify Supabase connectivity.
  * TODO: remove before production deployment
  */
-export default async function Page({ params, searchParams }: PageProps) {
+export default async function Page() {
   const supabase = await createClient()
   // Try to fetch from a public table, e.g., 'users'
   const { data, error } = await supabase.from('users').select('*').limit(1)
