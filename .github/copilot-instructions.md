@@ -624,6 +624,7 @@ describe('UserProfile', () => {
 
 ## Code Generation Instructions
 
+
 ### When creating new features:
 
 - Start with TypeScript interfaces/types
@@ -634,10 +635,12 @@ describe('UserProfile', () => {
 - Add Supabase integration with proper types
 - Include Zod validation for forms and API routes
 - Implement responsive design with Tailwind
-- Always ensure the feature is working. I prefer we do the following to ensure the app the is in a working state per iteration:
-  1. Run pnpm lint
-  2. Run pnpm build
-  3. Run pnpm dev (for me to test a newly implemented feature)
+- **Write tests as you build each feature.** Add unit, integration, and/or e2e tests for new components, pages, and API routes. This ensures no regression as features are shipped and helps maintain code quality.
+- Always ensure the feature is working. I prefer we do the following to ensure the app is in a working state per iteration:
+  1. Write and run tests for the new feature
+  2. Run pnpm lint
+  3. Run pnpm build
+  4. Run pnpm dev (for me to test a newly implemented feature)
 
 ### Always consider:
 
