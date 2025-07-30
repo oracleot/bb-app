@@ -1,6 +1,8 @@
 import React from 'react'
 import Image from "next/image"
 import Link from "next/link"
+import { BorderBeam } from "@/components/magicui/border-beam"
+import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 
 interface ModuleGridProps {
   progress: Array<{
@@ -23,7 +25,7 @@ const modules = [
 // Local map of expected steps per module
 const moduleSteps: Record<number, string[]> = {
   1: ["concept", "case-study", "connection", "workshop", "takeaway"],
-  2: [],
+  2: ["concept"],
   3: [],
   4: [],
   5: [],
@@ -54,39 +56,50 @@ export default function ModuleGrid({ progress }: ModuleGridProps) {
         return (
           <div key={mod.id} className="relative">
             <Link href={moduleLink} className={"no-underline " + (isComingSoon ? "pointer-events-none" : "") } tabIndex={isComingSoon ? -1 : 0}>
-              <div
+              <Card
                 className={
-                  "bg-card rounded-lg shadow p-4 flex flex-col items-center justify-between transition " +
+                  "p-4 transition " +
                   (isCompleted ? "border-emerald-500 border-2" : isInProgress ? "border-blue-500 border-2" : isComingSoon ? "border border-muted opacity-60" : "border border-muted")
                 }
                 aria-disabled={isComingSoon}
               >
-                <Image
-                  src={mod.image.startsWith('/') ? mod.image : `/` + mod.image}
-                  alt={mod.title}
-                  width={96}
-                  height={96}
-                  className="w-24 h-24 object-cover rounded mb-2"
-                  unoptimized={false}
-                  {...(mod.id === 1 ? { priority: true } : { loading: "lazy" })}
+                <CardHeader className='text-center'>
+                  <h2 className="text-lg font-bold">{mod.title}</h2>
+                </CardHeader>
+                <CardContent className='flex flex-col items-center justify-between'>
+                  <Image
+                    src={mod.image.startsWith('/') ? mod.image : `/` + mod.image}
+                    alt={mod.title}
+                    width={150}
+                    height={150}
+                    className="w-36 h-36 object-cover rounded"
+                    unoptimized={false}
+                    {...(mod.id === 1 ? { priority: true } : { loading: "lazy" })}
+                  />
+                </CardContent>
+                <CardFooter className="flex justify-center">
+                  {isComingSoon ? (
+                    <span className="text-xs px-3 py-2 rounded bg-muted text-muted-foreground min-w-[120px] text-center">Coming Soon</span>
+                  ) : isCompleted ? (
+                    <span className="text-xs px-3 py-2 rounded bg-emerald-100 text-emerald-700 flex items-center gap-1 min-w-[120px] text-center">
+                      <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path stroke="#059669" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>
+                      Completed
+                    </span>
+                  ) : isInProgress ? (
+                    <span className="text-xs py-2 rounded bg-blue-100 text-blue-700 w-full text-center block">
+                      In Progress
+                    </span>
+                  ) : (
+                    <span className="text-xs px-3 py-2 rounded bg-muted text-muted-foreground min-w-[120px] text-center">Not Started</span>
+                  )}
+                </CardFooter>
+                <BorderBeam
+                  duration={4}
+                  size={300}
+                  reverse
+                  className="from-transparent via-green-500 to-transparent"
                 />
-                <h2 className="text-lg font-semibold mb-1">{mod.title}</h2>
-                {isComingSoon ? (
-                  <span className="text-xs px-3 py-2 rounded bg-muted text-muted-foreground min-w-[120px] text-center">Coming Soon</span>
-                ) : isCompleted ? (
-                  <span className="text-xs px-3 py-2 rounded bg-emerald-100 text-emerald-700 flex items-center gap-1 min-w-[120px] text-center">
-                    <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path stroke="#059669" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>
-                    Completed
-                  </span>
-                ) : isInProgress ? (
-                  <span className="text-xs px-3 py-2 rounded bg-blue-100 text-blue-700 min-w-[120px] text-center block">
-                    In Progress
-                    <span className="block font-medium mt-1">{completedCount} / {totalSteps} completed</span>
-                  </span>
-                ) : (
-                  <span className="text-xs px-3 py-2 rounded bg-muted text-muted-foreground min-w-[120px] text-center">Not Started</span>
-                )}
-              </div>
+              </Card>
             </Link>
             {isComingSoon && (
               <div className="absolute inset-0 bg-card/70 flex items-center justify-center rounded-lg">
