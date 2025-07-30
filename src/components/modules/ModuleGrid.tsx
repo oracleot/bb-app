@@ -19,17 +19,17 @@ const modules = [
   { id: 3, title: "Personas", image: "content/images/module3.png" },
   { id: 4, title: "Examples", image: "content/images/module4.png" },
   { id: 5, title: "Step-by-step", image: "content/images/module5.png" },
-  { id: 6, title: "Capstone Project", image: "content/images/module6.png" },
+  { id: 6, title: "Project", image: "content/images/module6.png" },
 ]
 
 // Local map of expected steps per module
 const moduleSteps: Record<number, string[]> = {
   1: ["concept", "case-study", "connection", "workshop", "takeaway"],
   2: ["concept"],
-  3: [],
-  4: [],
-  5: [],
-  6: [],
+  3: ["concept"],
+  4: ["concept"],
+  5: ["concept"],
+  6: ["concept"],
 }
 
 /**
@@ -87,7 +87,7 @@ export default function ModuleGrid({ progress }: ModuleGridProps) {
                     </span>
                   ) : isInProgress ? (
                     <span className="text-xs py-2 rounded bg-blue-100 text-blue-700 w-full text-center block">
-                      In Progress
+                      In Progress (<span className='font-bold'>{completedCount}</span>/{totalSteps})
                     </span>
                   ) : (
                     <span className="text-xs px-3 py-2 rounded bg-muted text-muted-foreground min-w-[120px] text-center">Not Started</span>
