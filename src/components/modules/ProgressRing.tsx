@@ -13,7 +13,9 @@ interface ProgressRingProps {
  * ProgressRing displays the user's overall completion as a ring.
  */
 export default function ProgressRing({ progress }: ProgressRingProps) {
-  const completed = progress.filter((p) => p.completed_at).length
+  // Count unique completed modules
+  const completedModuleIds = new Set(progress.filter((p) => p.completed_at).map((p) => p.module_id))
+  const completed = completedModuleIds.size
   const total = 6 // 6 modules
   const percent = Math.round((completed / total) * 100)
 
