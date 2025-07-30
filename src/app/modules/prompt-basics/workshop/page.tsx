@@ -3,7 +3,6 @@ import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useStepCompletion } from '@/hooks/useStepCompletion'
 import { StepCompletionCheckbox } from '@/components/modules/StepCompletionCheckbox'
-import { getMostRecentStep } from '@/lib/supabase/getMostRecentStep'
 import { useCurrentUser } from '@/hooks/useCurrentUser'
 import { Button } from '@/components/ui/button'
 import { WorkshopForm } from "@/components/modules/WorkshopForm"

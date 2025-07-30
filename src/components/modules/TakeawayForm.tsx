@@ -17,6 +17,7 @@ export function TakeawayForm() {
   function onSubmit(values: z.infer<typeof takeawaySchema>) {
     // TODO: Save reflection to Supabase
     // Show celebration animation
+    console.log(values);
   }
 
   return (

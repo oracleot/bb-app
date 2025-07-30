@@ -3,7 +3,6 @@ import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useStepCompletion } from '@/hooks/useStepCompletion'
 import { StepCompletionCheckbox } from '@/components/modules/StepCompletionCheckbox'
-import { getMostRecentStep } from '@/lib/supabase/getMostRecentStep'
 import { useCurrentUser } from '@/hooks/useCurrentUser'
 import { Button } from '@/components/ui/button'
 import { TakeawayForm } from "@/components/modules/TakeawayForm"
@@ -77,13 +76,20 @@ export default function TakeawayScreen() {
         >
           Back
         </Button>
-        <Button
-          type="button"
-          disabled={!isCompleted || isLoading}
-          onClick={handleNext}
-        >
-          Next
-        </Button>
+        {isCompleted ? (
+          <Button type="button" disabled className="flex items-center gap-2 bg-emerald-100 text-emerald-700 cursor-not-allowed">
+            <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path stroke="#059669" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>
+            Module Completed
+          </Button>
+        ) : (
+          <Button
+            type="button"
+            disabled={!isCompleted || isLoading}
+            onClick={handleNext}
+          >
+            Next
+          </Button>
+        )}
       </div>
     </section>
   )

@@ -16,7 +16,8 @@ export function WorkshopForm() {
 
   function onSubmit(values: z.infer<typeof workshopSchema>) {
     // TODO: Save response to Supabase
-    // Show feedback/animation
+    // Show celebration animation
+    console.log('Workshop response:', values);
   }
 
   return (

@@ -3,7 +3,6 @@
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useCurrentUser } from '@/hooks/useCurrentUser'
 
 // Next.js expects: { children: React.ReactNode; params: { [key: string]: string } }
 
@@ -19,7 +18,6 @@ export default function ModuleLayout({ children }: { children: React.ReactNode }
   const pathname = usePathname();
   const currentScreenIdx = screens.findIndex((screen) => pathname.includes(screen.path));
   const safeScreenIdx = currentScreenIdx !== -1 ? currentScreenIdx : 0;
-  const { userId, isLoading, error } = useCurrentUser();
 
   return (
     <div className="flex flex-col min-h-screen">

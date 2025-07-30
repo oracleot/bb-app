@@ -1,5 +1,4 @@
 import { createClient } from './server'
-import { cookies } from 'next/headers'
 
 /**
  * Track user progress for a given module and screen.
@@ -8,8 +7,7 @@ import { cookies } from 'next/headers'
  */
 export async function trackProgress(moduleId: string, screenId: string) {
   const supabase = await createClient()
-  const cookieStore = await cookies()
-  // Get user from session
+  
   const {
     data: { user },
   } = await supabase.auth.getUser()

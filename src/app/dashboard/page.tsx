@@ -15,7 +15,6 @@ export default async function DashboardPage() {
   const {
     data: { user: authUser },
   } = await supabase.auth.getUser()
-  // ...existing code...
   let user = null
   let userError: Error | null = null
   let progress: Array<{ module_id: number; completed_at?: string; score?: number }> = []
@@ -36,10 +35,10 @@ export default async function DashboardPage() {
   userError = userRes.error
 
   if (user?.id) {
-    // Query user_progress for all rows for this user
+    // Query user_progress for all rows for this user, including step
     const progressRes = await supabase
       .from("user_progress")
-      .select("module_id, completed_at, score")
+      .select("module_id, step, completed_at, score")
       .eq("user_id", user.id)
     progress = progressRes.data || []
     progressError = progressRes.error
@@ -98,7 +97,10 @@ export default async function DashboardPage() {
             <SettingsButton />
           </div>
           <div className="md:col-span-2 space-y-6">
-            <ModuleGrid progress={progress} />
+      {/* Define steps for each module. Only Prompt Basics has steps for now. Others are empty arrays (Coming Soon). */}
+      <ModuleGrid
+        progress={progress}
+      />
             <ActivityFeed activity={activity} />
           </div>
         </div>

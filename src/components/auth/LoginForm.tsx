@@ -53,7 +53,7 @@ export function LoginForm() {
       const authUser = sessionData?.session?.user
       if (authUser?.id) {
         // Try to fetch user profile from users table
-        const { data: userProfile, error: userProfileError } = await supabase
+        const { data: userProfile } = await supabase
           .from('users')
           .select('id')
           .eq('id', authUser.id)
