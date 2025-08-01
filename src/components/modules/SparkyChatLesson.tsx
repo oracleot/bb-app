@@ -17,6 +17,7 @@ interface ChatMessage {
   role: 'sparky' | 'user'
   timestamp: Date
   isTyping?: boolean
+  delay?: number
 }
 
 // Main component props
@@ -233,7 +234,8 @@ function SparkyChatLesson({
         content: script.sparkyMessage,
         role: 'sparky',
         timestamp: new Date(),
-        isTyping: true
+        isTyping: true,
+        delay: script.delay || 0
       }
 
       setMessages(prev => [...prev, sparkyMessage])
@@ -410,7 +412,13 @@ function SparkyChatLesson({
                     : "bg-white border-3 border-yellow-300 text-gray-800 mr-16"
                 )}
               >
-                <TypingAnimation as="span" style={{fontSize: 16, lineHeight: 1.5}}>{message.content}</TypingAnimation>
+                <TypingAnimation 
+                  delay={message.delay || 0} 
+                  as="span" 
+                  style={{fontSize: 16, lineHeight: 1.5}}
+                >
+                  {message.content}
+                </TypingAnimation>
 
                 {message.role === 'sparky' && 
                  messageIndex === messages.length - 1 && 

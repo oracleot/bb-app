@@ -1,5 +1,19 @@
 import type { LessonScript } from './SparkyLesson'
 
+// Helper function to calculate typing duration (chars * 30ms + base delay)
+const calculateTypingDuration = (text: string): number => {
+  return Math.max(1000, text.length * 30) + 500 // Base 1000ms minimum + 500ms buffer
+}
+
+// Helper function to calculate cumulative delay
+const calculateCumulativeDelay = (scripts: LessonScript[], currentIndex: number): number => {
+  let totalDelay = 0
+  for (let i = 0; i < currentIndex; i++) {
+    totalDelay += calculateTypingDuration(scripts[i].sparkyMessage)
+  }
+  return totalDelay
+}
+
 // New chat-based lesson script based on provided script
 export const newPromptBasicsLessonScript: LessonScript[] = [
   // Scene Intro
@@ -7,13 +21,15 @@ export const newPromptBasicsLessonScript: LessonScript[] = [
     id: "scene-intro-1",
     type: "intro",
     sparkyMessage: "🎉 Hi there, Bright Thinker! I'm Sparky, your friendly Code Guide from the Kingdom of Curiosity. Around here, we use the power of prompts to unlock amazing things in the world of AI!",
-    choices: []
+    choices: [],
+    delay: 0
   },
   {
     id: "scene-intro-2", 
     type: "intro",
     sparkyMessage: "Think of a prompt like a clear instruction or a tiny prayer for clarity — it's how we guide smart AIs to do awesome stuff like writing stories, solving puzzles, or even helping others.",
-    choices: []
+    choices: [],
+    delay: 0 // Will be calculated below
   },
   {
     id: "scene-intro-proceed",
@@ -21,9 +37,14 @@ export const newPromptBasicsLessonScript: LessonScript[] = [
     sparkyMessage: "Ready to proceed?",
     choices: [
       { text: "Yes, please proceed", value: "proceed" }
-    ]
+    ],
+    delay: 0 // Will be calculated below
   }
 ]
+
+// Calculate delays for newPromptBasicsLessonScript
+newPromptBasicsLessonScript[1].delay = calculateCumulativeDelay(newPromptBasicsLessonScript, 1)
+newPromptBasicsLessonScript[2].delay = calculateCumulativeDelay(newPromptBasicsLessonScript, 2)
 
 // Learning Goal section
 export const learningGoalScript: LessonScript[] = [
@@ -33,7 +54,8 @@ export const learningGoalScript: LessonScript[] = [
     sparkyMessage: "Today, I'll teach you how to make powerful prompts that help AIs understand exactly what you mean.",
     choices: [
       { text: "Let's learn!", value: "continue" }
-    ]
+    ],
+    delay: 0
   }
 ]
 
@@ -45,7 +67,8 @@ export const activity1Script: LessonScript[] = [
     sparkyMessage: "Let's play a quick game called: 'Vague or Valuable?' I'll show you a prompt, and you choose: ❌ Vague (Too unclear) or ✅ Valuable (Nice and specific)",
     choices: [
       { text: "I'm ready to play!", value: "ready" }
-    ]
+    ],
+    delay: 0
   },
   {
     id: "activity1-prompt1",
@@ -54,7 +77,8 @@ export const activity1Script: LessonScript[] = [
     choices: [
       { text: "❌ Vague (Too unclear)", value: "vague", isCorrect: true },
       { text: "✅ Valuable (Nice and specific)", value: "valuable", isCorrect: false }
-    ]
+    ],
+    delay: 0
   },
   {
     id: "activity1-feedback1",
@@ -62,7 +86,8 @@ export const activity1Script: LessonScript[] = [
     sparkyMessage: "🎉 Correct! That's too vague. The AI won't know what you want.",
     choices: [
       { text: "Next prompt please!", value: "next" }
-    ]
+    ],
+    delay: 0
   },
   {
     id: "activity1-prompt2",
@@ -71,7 +96,8 @@ export const activity1Script: LessonScript[] = [
     choices: [
       { text: "❌ Vague (Too unclear)", value: "vague", isCorrect: false },
       { text: "✅ Valuable (Nice and specific)", value: "valuable", isCorrect: true }
-    ]
+    ],
+    delay: 0
   },
   {
     id: "activity1-feedback2", 
@@ -79,9 +105,15 @@ export const activity1Script: LessonScript[] = [
     sparkyMessage: "🎉 You've got it! That's a valuable prompt — specific, creative, and clear.",
     choices: [
       { text: "Awesome! What's next?", value: "continue" }
-    ]
+    ],
+    delay: 0
   }
 ]
+
+// Calculate delays for activity1Script
+for (let i = 1; i < activity1Script.length; i++) {
+  activity1Script[i].delay = calculateCumulativeDelay(activity1Script, i)
+}
 
 // Activity 2 - Prompt Power-Up  
 export const activity2Script: LessonScript[] = [
@@ -91,13 +123,15 @@ export const activity2Script: LessonScript[] = [
     sparkyMessage: "Now you try! I'll show you a wobbly prompt, and you make it better. ✏️ Original: \"Make something about food.\" 🔨 Your Challenge: Rewrite this prompt to be more fun, more clear, more awesome. (You can use creativity — story, poem, list, anything!)",
     choices: [
       { text: "I'm ready to rewrite it!", value: "ready" }
-    ]
+    ],
+    delay: 0
   },
   {
     id: "activity2-input",
     type: "activity",
     sparkyMessage: "Please write your improved version of the prompt below:",
-    inputRequired: true
+    inputRequired: true,
+    delay: 0
   },
   {
     id: "activity2-feedback",
@@ -105,9 +139,15 @@ export const activity2Script: LessonScript[] = [
     sparkyMessage: "Sparktastic! You gave it details and made it shine! 🌟",
     choices: [
       { text: "That was fun! What's next?", value: "continue" }
-    ]
+    ],
+    delay: 0
   }
 ]
+
+// Calculate delays for activity2Script
+for (let i = 1; i < activity2Script.length; i++) {
+  activity2Script[i].delay = calculateCumulativeDelay(activity2Script, i)
+}
 
 // Power Unlocked - 3-Part Prompt Spell
 export const powerUnlockedScript: LessonScript[] = [
@@ -117,7 +157,8 @@ export const powerUnlockedScript: LessonScript[] = [
     sparkyMessage: "🏆 Power Unlocked: The 3-Part Prompt Spell! Every great prompt has 3 magic parts — kind of like a recipe!",
     choices: [
       { text: "Tell me the 3 parts!", value: "continue" }
-    ]
+    ],
+    delay: 0
   },
   {
     id: "power-unlocked-parts",
@@ -125,7 +166,8 @@ export const powerUnlockedScript: LessonScript[] = [
     sparkyMessage: "🧠 1. Task – What do you want the AI to do?\n📦 2. Details – What topic, style, or purpose?\n🧾 3. Format – Should it be a list? A paragraph? A poem?",
     choices: [
       { text: "I understand the 3 parts!", value: "continue" }
-    ]
+    ],
+    delay: 0
   },
   {
     id: "power-unlocked-badge",
@@ -133,9 +175,15 @@ export const powerUnlockedScript: LessonScript[] = [
     sparkyMessage: "You just earned your Prompt Builder Badge! ⭐ Wear it with honor, Builder of Brilliant Ideas!",
     choices: [
       { text: "Thank you, Sparky!", value: "continue" }
-    ]
+    ],
+    delay: 0
   }
 ]
+
+// Calculate delays for powerUnlockedScript
+for (let i = 1; i < powerUnlockedScript.length; i++) {
+  powerUnlockedScript[i].delay = calculateCumulativeDelay(powerUnlockedScript, i)
+}
 
 // Optional Reflection
 export const reflectionScript: LessonScript[] = [
@@ -146,7 +194,8 @@ export const reflectionScript: LessonScript[] = [
     choices: [
       { text: "That's a beautiful connection!", value: "continue" },
       { text: "Ready for the next lesson!", value: "next" }
-    ]
+    ],
+    delay: 0
   }
 ]
 
@@ -159,11 +208,12 @@ export const nextLessonScript: LessonScript[] = [
     choices: [
       { text: "Yes! Take me to Lesson 2!", value: "lesson2" },
       { text: "I want to review this lesson first", value: "review" }
-    ]
+    ],
+    delay: 0
   }
 ]
 
-// Original lesson script (keeping for reference)
+// Original lesson script (keeping for reference) - with delays calculated
 export const promptBasicsLessonScript: LessonScript[] = [
   {
     id: "opening-welcome",
@@ -173,7 +223,8 @@ export const promptBasicsLessonScript: LessonScript[] = [
       { text: "Yes! Let's start learning!", value: "ready" },
       { text: "What exactly is prompt engineering?", value: "what-is-it" },
       { text: "I'm a bit nervous, but let's go!", value: "nervous-but-ready" }
-    ]
+    ],
+    delay: 0
   },
   {
     id: "what-is-prompt-engineering",
@@ -182,7 +233,8 @@ export const promptBasicsLessonScript: LessonScript[] = [
     choices: [
       { text: "That makes sense! Let's continue.", value: "continue" },
       { text: "Can you give me an example?", value: "example-request" }
-    ]
+    ],
+    delay: 0
   },
   {
     id: "simple-example",
@@ -192,7 +244,8 @@ export const promptBasicsLessonScript: LessonScript[] = [
       { text: "Wow, that's so much more specific!", value: "specific-good" },
       { text: "How do I know what details to include?", value: "how-to-details" },
       { text: "Let's practice with an example!", value: "practice-ready" }
-    ]
+    ],
+    delay: 0
   },
   {
     id: "why-specificity-matters",
@@ -201,14 +254,16 @@ export const promptBasicsLessonScript: LessonScript[] = [
     choices: [
       { text: "That's a perfect analogy!", value: "great-analogy" },
       { text: "What are the key elements of a good prompt?", value: "key-elements" }
-    ]
+    ],
+    delay: 0
   },
   {
     id: "key-elements",
     type: "lesson",
     sparkyMessage: "Great question! 🔑 The key elements of a stellar prompt include: **Context** (background info), **Task** (what you want done), **Format** (how you want the output), **Tone** (formal, casual, funny), **Length** (short, detailed), **Audience** (who it's for), and **Examples** (showing what you want). Think of it as the recipe for prompt success! Can you name one of these key elements?",
     inputRequired: true,
-    expectedResponses: ["context", "task", "format", "tone", "length", "audience", "examples", "recipe"]
+    expectedResponses: ["context", "task", "format", "tone", "length", "audience", "examples", "recipe"],
+    delay: 0
   },
   {
     id: "practice-introduction",
@@ -217,13 +272,15 @@ export const promptBasicsLessonScript: LessonScript[] = [
     choices: [
       { text: "Let's make it more specific!", value: "improve-prompt" },
       { text: "What details should I consider?", value: "need-guidance" }
-    ]
+    ],
+    delay: 0
   },
   {
     id: "practice-guidance",
     type: "activity",
     sparkyMessage: "Smart thinking! 🎉 For a birthday party prompt, consider: Whose birthday? (age matters!), How many guests?, What's your budget?, Indoor or outdoor?, Any theme preferences?, Dietary restrictions?, How much time do you have to plan?, Any special requirements? The more details you provide, the more personalized and helpful the AI's suggestions will be! Now try writing a more detailed birthday party planning prompt! Include at least 3 of these details.",
-    inputRequired: true
+    inputRequired: true,
+    delay: 0
   },
   {
     id: "practice-feedback",
@@ -233,7 +290,8 @@ export const promptBasicsLessonScript: LessonScript[] = [
       { text: "This is really helpful! What's next?", value: "whats-next" },
       { text: "Can we try another example?", value: "another-example" },
       { text: "I feel like I'm getting the hang of this!", value: "feeling-confident" }
-    ]
+    ],
+    delay: 0
   },
   {
     id: "common-mistakes",
@@ -242,7 +300,8 @@ export const promptBasicsLessonScript: LessonScript[] = [
     choices: [
       { text: "Good to know what to avoid!", value: "avoid-mistakes" },
       { text: "How do I get better at this?", value: "how-improve" }
-    ]
+    ],
+    delay: 0
   },
   {
     id: "improvement-tips",
@@ -251,7 +310,8 @@ export const promptBasicsLessonScript: LessonScript[] = [
     choices: [
       { text: "I'm excited to practice more!", value: "excited-practice" },
       { text: "This gives me confidence to try!", value: "confident" }
-    ]
+    ],
+    delay: 0
   },
   {
     id: "lesson-conclusion",
@@ -261,9 +321,15 @@ export const promptBasicsLessonScript: LessonScript[] = [
       { text: "Thank you, Sparky! This was great!", value: "thank-you" },
       { text: "I'm ready for the next lesson!", value: "next-lesson" },
       { text: "Can I review the key points?", value: "review" }
-    ]
+    ],
+    delay: 0
   }
 ]
+
+// Calculate delays for promptBasicsLessonScript
+for (let i = 1; i < promptBasicsLessonScript.length; i++) {
+  promptBasicsLessonScript[i].delay = calculateCumulativeDelay(promptBasicsLessonScript, i)
+}
 
 // Additional lesson scripts can be added here
 export const availableLessons = {

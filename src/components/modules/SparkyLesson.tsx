@@ -17,6 +17,7 @@ interface LessonScript {
   choices?: { text: string; value: string; isCorrect?: boolean }[]
   inputRequired?: boolean
   customValidation?: (input: string) => boolean
+  delay?: number // Delay before showing this script in milliseconds
 }
 
 // Message interface for chat display
