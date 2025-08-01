@@ -181,9 +181,14 @@ function SparkyChatLesson({
   const [waitingForResponse, setWaitingForResponse] = React.useState(false)
   const [showChoices, setShowChoices] = React.useState(false)
   const [processingChoice, setProcessingChoice] = React.useState(false)
-  const [initialized, setInitialized] = React.useState(false)
+  const [isInitialized, setIsInitialized] = React.useState(false)
+  
   const inputRef = React.useRef<HTMLInputElement>(null)
   const messagesEndRef = React.useRef<HTMLDivElement>(null)
+  
+  // Use ref to track lesson scripts to prevent re-initialization on navigation
+  const lessonScriptsRef = React.useRef(lessonScripts)
+  const hasStartedRef = React.useRef(false)
 
   const currentScript = lessonScripts?.[currentScriptIndex]
 
@@ -196,6 +201,24 @@ function SparkyChatLesson({
       })
     }
   }, [messages, isTyping])
+
+  // Helper to proceed to next script or complete lesson
+  const proceedToNext = React.useCallback(() => {
+    setCurrentScriptIndex(prevIndex => {
+      const nextIndex = prevIndex + 1
+      if (nextIndex >= lessonScripts.length) {
+        // Lesson complete
+        if (nextRouteOnComplete) {
+          setTimeout(() => {
+            router.push(nextRouteOnComplete)
+          }, 1500)
+        } else {
+          onLessonComplete?.()
+        }
+      }
+      return nextIndex
+    })
+  }, [lessonScripts.length, nextRouteOnComplete, router, onLessonComplete])
 
   const startScript = React.useCallback((script: LessonScript, delay = 800) => {
     setTimeout(() => {
@@ -230,52 +253,60 @@ function SparkyChatLesson({
         } else {
           // Auto-proceed after a delay for messages without interaction
           setTimeout(() => {
-            // Use callback to avoid stale closure
-            setCurrentScriptIndex(prevIndex => {
-              const nextIndex = prevIndex + 1
-              if (nextIndex >= lessonScripts.length) {
-                // Lesson complete
-                if (nextRouteOnComplete) {
-                  setTimeout(() => {
-                    router.push(nextRouteOnComplete)
-                  }, 1500)
-                } else {
-                  onLessonComplete?.()
-                }
-              }
-              return nextIndex
-            })
+            proceedToNext()
           }, 1200)
         }
       }, typingDuration)
     }, delay)
-  }, [lessonScripts, nextRouteOnComplete, router, onLessonComplete])
+  }, [proceedToNext])
 
-  // Reset state when lessonScripts change (navigation between lessons)
+  // Reset everything when lessonScripts change (navigation between lessons)
   React.useEffect(() => {
-    setMessages([])
-    setCurrentScriptIndex(0)
-    setInitialized(false)
-    setIsTyping(false)
-    setWaitingForResponse(false)
-    setShowChoices(false)
-    setProcessingChoice(false)
+    // Check if lessonScripts actually changed by comparing reference
+    if (lessonScriptsRef.current !== lessonScripts) {
+      lessonScriptsRef.current = lessonScripts
+      hasStartedRef.current = false
+      
+      // Reset all state
+      setMessages([])
+      setCurrentScriptIndex(0)
+      setIsInitialized(false)
+      setIsTyping(false)
+      setWaitingForResponse(false)
+      setShowChoices(false)
+      setProcessingChoice(false)
+      setInput("")
+    }
   }, [lessonScripts])
 
-  // Start first script once on component mount or after reset
+  // Initialize lesson - only run once per lesson
   React.useEffect(() => {
-    if (lessonScripts.length > 0 && messages.length === 0 && !initialized) {
-      setInitialized(true)
-      startScript(lessonScripts[0], 300)
+    if (
+      lessonScripts && 
+      lessonScripts.length > 0 && 
+      !isInitialized && 
+      !hasStartedRef.current
+    ) {
+      hasStartedRef.current = true
+      setIsInitialized(true)
+      
+      // Start first script with a small delay
+      setTimeout(() => {
+        startScript(lessonScripts[0], 300)
+      }, 100)
     }
-  }, [lessonScripts, messages.length, initialized, startScript])
+  }, [lessonScripts, isInitialized, startScript])
 
-  // Handle script progression - only for non-zero indices
+  // Handle script progression - run when currentScriptIndex changes (after first)
   React.useEffect(() => {
-    if (currentScriptIndex > 0 && currentScriptIndex < lessonScripts.length && initialized) {
+    if (
+      currentScriptIndex > 0 && 
+      currentScriptIndex < lessonScripts.length && 
+      isInitialized
+    ) {
       startScript(lessonScripts[currentScriptIndex])
     }
-  }, [currentScriptIndex, lessonScripts, startScript, initialized])
+  }, [currentScriptIndex, lessonScripts, startScript, isInitialized])
 
   const handleChoice = React.useCallback((value: string) => {
     if (processingChoice || !currentScript) return
@@ -297,22 +328,9 @@ function SparkyChatLesson({
     
     // Move to next script after a delay
     setTimeout(() => {
-      setCurrentScriptIndex(prevIndex => {
-        const nextIndex = prevIndex + 1
-        if (nextIndex >= lessonScripts.length) {
-          // Lesson complete
-          if (nextRouteOnComplete) {
-            setTimeout(() => {
-              router.push(nextRouteOnComplete)
-            }, 1500)
-          } else {
-            onLessonComplete?.()
-          }
-        }
-        return nextIndex
-      })
+      proceedToNext()
     }, 1200)
-  }, [currentScript, processingChoice, lessonScripts, nextRouteOnComplete, router, onLessonComplete])
+  }, [currentScript, processingChoice, proceedToNext])
 
   const handleSubmit = React.useCallback((e: React.FormEvent) => {
     e.preventDefault()
@@ -332,22 +350,9 @@ function SparkyChatLesson({
     
     // Move to next script after showing user input
     setTimeout(() => {
-      setCurrentScriptIndex(prevIndex => {
-        const nextIndex = prevIndex + 1
-        if (nextIndex >= lessonScripts.length) {
-          // Lesson complete
-          if (nextRouteOnComplete) {
-            setTimeout(() => {
-              router.push(nextRouteOnComplete)
-            }, 1500)
-          } else {
-            onLessonComplete?.()
-          }
-        }
-        return nextIndex
-      })
+      proceedToNext()
     }, 1000)
-  }, [input, waitingForResponse, processingChoice, lessonScripts, nextRouteOnComplete, router, onLessonComplete])
+  }, [input, waitingForResponse, processingChoice, proceedToNext])
 
   // Guard clause for invalid state
   if (!lessonScripts || lessonScripts.length === 0) {
@@ -407,7 +412,6 @@ function SparkyChatLesson({
               >
                 <TypingAnimation as="span" style={{fontSize: 16, lineHeight: 1.5}}>{message.content}</TypingAnimation>
 
-                {/* Show choices after typing is complete for the latest Sparky message */}
                 {message.role === 'sparky' && 
                  messageIndex === messages.length - 1 && 
                  showChoices && 
