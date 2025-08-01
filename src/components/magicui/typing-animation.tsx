@@ -11,6 +11,8 @@ interface TypingAnimationProps extends MotionProps {
   delay?: number;
   as?: React.ElementType;
   startOnView?: boolean;
+  onComplete?: () => void;
+  onStart?: () => void;
 }
 
 export function TypingAnimation({
@@ -20,6 +22,8 @@ export function TypingAnimation({
   delay = 0,
   as: Component = "div",
   startOnView = false,
+  onComplete,
+  onStart,
   ...props
 }: TypingAnimationProps) {
   const MotionComponent = motion.create(Component, {
@@ -28,12 +32,14 @@ export function TypingAnimation({
 
   const [displayedText, setDisplayedText] = useState<string>("");
   const [started, setStarted] = useState(false);
+  const [completed, setCompleted] = useState(false);
   const elementRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     if (!startOnView) {
       const startTimeout = setTimeout(() => {
         setStarted(true);
+        onStart?.();
       }, delay);
       return () => clearTimeout(startTimeout);
     }
@@ -43,6 +49,7 @@ export function TypingAnimation({
         if (entry.isIntersecting) {
           setTimeout(() => {
             setStarted(true);
+            onStart?.();
           }, delay);
           observer.disconnect();
         }
@@ -55,7 +62,7 @@ export function TypingAnimation({
     }
 
     return () => observer.disconnect();
-  }, [delay, startOnView]);
+  }, [delay, startOnView, onStart]);
 
   useEffect(() => {
     if (!started) return;
@@ -67,13 +74,17 @@ export function TypingAnimation({
         i++;
       } else {
         clearInterval(typingEffect);
+        if (!completed) {
+          setCompleted(true);
+          onComplete?.();
+        }
       }
     }, duration);
 
     return () => {
       clearInterval(typingEffect);
     };
-  }, [children, duration, started]);
+  }, [children, duration, started, completed, onComplete]);
 
   return (
     <MotionComponent

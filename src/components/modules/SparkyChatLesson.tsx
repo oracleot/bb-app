@@ -18,6 +18,7 @@ interface ChatMessage {
   timestamp: Date
   isTyping?: boolean
   delay?: number
+  isAnimationComplete?: boolean
 }
 
 // Main component props
@@ -221,7 +222,7 @@ function SparkyChatLesson({
     })
   }, [lessonScripts.length, nextRouteOnComplete, router, onLessonComplete])
 
-  const startScript = React.useCallback((script: LessonScript, delay = 800) => {
+  const startScript = React.useCallback((script: LessonScript, delay = 0) => {
     setTimeout(() => {
       setIsTyping(true)
       setWaitingForResponse(false)
@@ -235,31 +236,38 @@ function SparkyChatLesson({
         role: 'sparky',
         timestamp: new Date(),
         isTyping: true,
-        delay: script.delay || 0
+        delay: 0, // TypingAnimation will handle its own delay
+        isAnimationComplete: false
       }
 
       setMessages(prev => [...prev, sparkyMessage])
-      
-      // Since TypingAnimation doesn't have onComplete, simulate typing time and then show interactions
-      const typingDuration = Math.max(1000, script.sparkyMessage.length * 30) // Estimate typing time
-      setTimeout(() => {
-        setIsTyping(false)
-        
-        // Determine next action based on script type
-        if (script.choices && script.choices.length > 0) {
-          setShowChoices(true)
-          setWaitingForResponse(true)
-        } else if (script.inputRequired) {
-          setWaitingForResponse(true)
-          setTimeout(() => inputRef.current?.focus(), 200)
-        } else {
-          // Auto-proceed after a delay for messages without interaction
-          setTimeout(() => {
-            proceedToNext()
-          }, 1200)
-        }
-      }, typingDuration)
     }, delay)
+  }, [])
+
+  // Handle typing completion
+  const handleTypingComplete = React.useCallback((script: LessonScript, messageId: string) => {
+    // Mark the message as animation complete
+    setMessages(prev => prev.map(msg => 
+      msg.id === messageId 
+        ? { ...msg, isAnimationComplete: true }
+        : msg
+    ))
+    
+    setIsTyping(false)
+    
+    // Determine next action based on script type
+    if (script.choices && script.choices.length > 0) {
+      setShowChoices(true)
+      setWaitingForResponse(true)
+    } else if (script.inputRequired) {
+      setWaitingForResponse(true)
+      setTimeout(() => inputRef.current?.focus(), 200)
+    } else {
+      // Auto-proceed after a delay for messages without interaction
+      setTimeout(() => {
+        proceedToNext()
+      }, 1200)
+    }
   }, [proceedToNext])
 
   // Reset everything when lessonScripts change (navigation between lessons)
@@ -292,10 +300,9 @@ function SparkyChatLesson({
       hasStartedRef.current = true
       setIsInitialized(true)
       
-      // Start first script with a small delay
-      setTimeout(() => {
-        startScript(lessonScripts[0], 300)
-      }, 100)
+      // Start first script with its configured delay
+      const firstScript = lessonScripts[0]
+      startScript(firstScript, firstScript.delay || 300)
     }
   }, [lessonScripts, isInitialized, startScript])
 
@@ -306,7 +313,8 @@ function SparkyChatLesson({
       currentScriptIndex < lessonScripts.length && 
       isInitialized
     ) {
-      startScript(lessonScripts[currentScriptIndex])
+      const currentScript = lessonScripts[currentScriptIndex]
+      startScript(currentScript, currentScript.delay || 800)
     }
   }, [currentScriptIndex, lessonScripts, startScript, isInitialized])
 
@@ -324,7 +332,8 @@ function SparkyChatLesson({
       id: `user-choice-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       content: choiceText,
       role: 'user',
-      timestamp: new Date()
+      timestamp: new Date(),
+      isAnimationComplete: true // User messages don't need animation
     }
     setMessages(prev => [...prev, userMessage])
     
@@ -344,7 +353,8 @@ function SparkyChatLesson({
       id: `user-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       content: input.trim(),
       role: 'user',
-      timestamp: new Date()
+      timestamp: new Date(),
+      isAnimationComplete: true // User messages don't need animation
     }
     setMessages(prev => [...prev, userMessage])
 
@@ -412,13 +422,25 @@ function SparkyChatLesson({
                     : "bg-white border-3 border-yellow-300 text-gray-800 mr-16"
                 )}
               >
-                <TypingAnimation 
-                  delay={message.delay || 0} 
-                  as="span" 
-                  style={{fontSize: 16, lineHeight: 1.5}}
-                >
-                  {message.content}
-                </TypingAnimation>
+                {/* Conditionally render TypingAnimation or static text */}
+                {message.role === 'sparky' && 
+                 messageIndex === messages.length - 1 && 
+                 !message.isAnimationComplete ? (
+                  <TypingAnimation 
+                    delay={message.delay || 0} 
+                    as="span" 
+                    style={{fontSize: 16, lineHeight: 1.5}}
+                    onComplete={() => {
+                      handleTypingComplete(currentScript!, message.id)
+                    }}
+                  >
+                    {message.content}
+                  </TypingAnimation>
+                ) : (
+                  <span style={{fontSize: 16, lineHeight: 1.5}}>
+                    {message.content}
+                  </span>
+                )}
 
                 {message.role === 'sparky' && 
                  messageIndex === messages.length - 1 && 
