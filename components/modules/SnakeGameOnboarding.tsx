@@ -24,10 +24,10 @@ export interface SnakeGameOnboardingProps {
 export function SnakeGameOnboarding({ open, onStart }: SnakeGameOnboardingProps) {
   return (
     <Dialog open={open}>
-      <DialogContent className="max-w-md mx-auto">
+      <DialogContent className="max-w-md mx-auto" aria-modal="true" role="dialog" aria-labelledby="snake-onboarding-title" aria-describedby="snake-onboarding-desc">
         <DialogHeader>
-          <DialogTitle>How to Play Snake</DialogTitle>
-          <DialogDescription>
+          <DialogTitle id="snake-onboarding-title">How to Play Snake</DialogTitle>
+          <DialogDescription id="snake-onboarding-desc">
             In this game, you control the snake by typing clear, step-by-step instructions. Your goal is to guide the snake to eat apples, collect keys, and avoid obstacles using prompt engineering skills.
           </DialogDescription>
           <ul className="list-disc pl-5 space-y-2 text-sm mt-2">
@@ -60,7 +60,7 @@ export function SnakeGameOnboarding({ open, onStart }: SnakeGameOnboardingProps)
             className="rounded-lg"
             priority
           />
-          <Button className="w-full" onClick={onStart}>
+          <Button className="w-full" onClick={onStart} aria-label="Start the Snake Game">
             Start Game
           </Button>
         </div>
