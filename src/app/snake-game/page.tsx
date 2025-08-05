@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { RotateCcw, Star } from 'lucide-react';
 import { SnakeGameOnboarding } from '../../../components/modules/SnakeGameOnboarding';
 
@@ -142,6 +142,22 @@ function PromptPythonGame() {
 	const [gameState, setGameState] = useState('playing');
 	const [score, setScore] = useState(0);
 	const [showOnboarding, setShowOnboarding] = useState(true);
+
+	useEffect(() => {
+		if (typeof window !== 'undefined') {
+			const seen = localStorage.getItem('snakeGameOnboardingSeen');
+			if (seen === 'true') {
+				setShowOnboarding(false);
+			}
+		}
+	}, []);
+
+	function handleStartGame() {
+		setShowOnboarding(false);
+		if (typeof window !== 'undefined') {
+			localStorage.setItem('snakeGameOnboardingSeen', 'true');
+		}
+	}
 
 	// Utility functions
 	function normalizePosition(pos: { x: number; y: number }) {
@@ -328,10 +344,6 @@ function PromptPythonGame() {
 				{content}
 			</div>
 		);
-	}
-
-	function handleStartGame() {
-		setShowOnboarding(false);
 	}
 
 	if (gameState === 'completed') {
