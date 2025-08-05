@@ -6,16 +6,23 @@ export const newPromptBasicsLessonScript: LessonScript[] = [
   {
     id: "scene-intro-1",
     type: "intro",
-    sparkyMessage: "🎉 Hi there, Bright Thinker! I'm Sparky, your friendly Code Guide from the Kingdom of Curiosity. Around here, we use the power of prompts to unlock amazing things in the world of AI!",
+    sparkyMessage: "🎉 Hi there, Bright Thinker! I'm Sparky, your friendly Code Guide from the Kingdom of Curiosity.",
     choices: [],
     delay: 500 // Initial delay to let the component mount
   },
   {
-    id: "scene-intro-2", 
+    id: "scene-intro-2",
     type: "intro",
-    sparkyMessage: "Think of a prompt like a clear instruction or a tiny prayer for clarity — it's how we guide smart AIs to do awesome stuff like writing stories, solving puzzles, or even helping others.",
+    sparkyMessage: "Around here, we use the power of prompts to unlock amazing things in the world of AI!",
     choices: [],
-    delay: 800 // Delay between messages
+    delay: 500 // Initial delay to let the component mount
+  },
+  {
+    id: "scene-intro-3", 
+    type: "intro",
+    sparkyMessage: "Think of a prompt like a clear instruction or a tiny prayer for clarity — it's how we guide smart AIs to do awesome stuff like writing stories, solving puzzles, or even helping others...",
+    choices: [],
+    delay: 500 // Delay between messages
   },
   {
     id: "scene-intro-proceed",
@@ -24,7 +31,7 @@ export const newPromptBasicsLessonScript: LessonScript[] = [
     choices: [
       { text: "Yes, please proceed", value: "proceed" }
     ],
-    delay: 800 // Standard delay between messages
+    delay: 500 // Standard delay between messages
   }
 ]
 
@@ -46,7 +53,13 @@ export const activity1Script: LessonScript[] = [
   {
     id: "activity1-intro",
     type: "activity",
-    sparkyMessage: "Let's play a quick game called: 'Vague or Valuable?' I'll show you a prompt, and you choose: ❌ Vague (Too unclear) or ✅ Valuable (Nice and specific)",
+    sparkyMessage: "Let's play a quick game called: 'Vague or Valuable?'",
+    delay: 500
+  },
+  {
+    id: "activity1-intro-1",
+    type: "activity",
+    sparkyMessage: "I'll show you a prompt, and you choose: ❌ Vague (Too unclear) or ✅ Valuable (Nice and specific)",
     choices: [
       { text: "I'm ready to play!", value: "ready" }
     ],
@@ -55,12 +68,18 @@ export const activity1Script: LessonScript[] = [
   {
     id: "activity1-prompt1",
     type: "activity", 
-    sparkyMessage: "💬 Prompt 1: \"Tell me something.\" What do you think?",
+    sparkyMessage: "💬 Prompt 1: \"Tell me something.\"",
+    delay: 500
+  },
+  {
+    id: "activity1-prompt1",
+    type: "activity", 
+    sparkyMessage: "What do you think?",
     choices: [
       { text: "❌ Vague (Too unclear)", value: "vague", isCorrect: true },
       { text: "✅ Valuable (Nice and specific)", value: "valuable", isCorrect: false }
     ],
-    delay: 800
+    delay: 500
   },
   {
     id: "activity1-feedback1",
@@ -69,17 +88,23 @@ export const activity1Script: LessonScript[] = [
     choices: [
       { text: "Next prompt please!", value: "next" }
     ],
-    delay: 800
+    delay: 500
   },
   {
     id: "activity1-prompt2",
     type: "activity",
-    sparkyMessage: "💬 Prompt 2: \"Write a short poem about a brave ant who saves the forest.\" What do you think?",
+    sparkyMessage: "💬 Prompt 2: \"Write a short poem about a brave ant who saves the forest.\"",
+    delay: 500
+  },
+  {
+    id: "activity1-prompt2-ask",
+    type: "activity",
+    sparkyMessage: "What do you think?",
     choices: [
       { text: "❌ Vague (Too unclear)", value: "vague", isCorrect: false },
       { text: "✅ Valuable (Nice and specific)", value: "valuable", isCorrect: true }
     ],
-    delay: 800
+    delay: 500
   },
   {
     id: "activity1-feedback2", 
