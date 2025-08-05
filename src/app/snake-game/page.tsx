@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { RotateCcw, Star } from 'lucide-react';
+import { SnakeGameOnboarding } from '../../../components/modules/SnakeGameOnboarding';
 
 const GRID_SIZE = 5;
 
@@ -140,6 +141,7 @@ function PromptPythonGame() {
 	const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
 	const [gameState, setGameState] = useState('playing');
 	const [score, setScore] = useState(0);
+	const [showOnboarding, setShowOnboarding] = useState(true);
 
 	// Utility functions
 	function normalizePosition(pos: { x: number; y: number }) {
@@ -328,6 +330,10 @@ function PromptPythonGame() {
 		);
 	}
 
+	function handleStartGame() {
+		setShowOnboarding(false);
+	}
+
 	if (gameState === 'completed') {
 		return (
 			<div className="min-h-screen bg-gradient-to-br from-purple-400 via-pink-300 to-yellow-300 flex items-center justify-center p-4">
@@ -354,94 +360,101 @@ function PromptPythonGame() {
 
 	// Main game screen
 	return (
-		<div className="min-h-screen bg-gradient-to-br from-purple-400 via-pink-300 to-yellow-300 flex items-center justify-center p-4">
-			<div className="w-full max-w-4xl mx-auto">
-				<div className="text-center mb-6">
-					<h1 className="text-4xl font-bold text-white mb-2">🐍 Prompt the Python</h1>
-					<div className="bg-white rounded-2xl p-4 shadow-lg">
-						<h2 className="text-xl font-bold text-purple-800">
-							Level {currentLevel + 1}: {LEVELS[currentLevel].title}
-						</h2>
-						<p className="text-purple-600">{LEVELS[currentLevel].description}</p>
-						<p className="text-sm text-gray-600 mt-2">Goal: {LEVELS[currentLevel].goal}</p>
-					</div>
-				</div>
-				<div className="grid md:grid-cols-2 gap-6">
-					{feedback && (
-						<div className="md:col-span-2">
-							<div
-								className={`p-4 rounded-xl text-center ${
-									isCorrect ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'
-								}`}
-							>
-								<p className="font-medium text-lg">{feedback}</p>
+		<>
+			{showOnboarding && (
+				<SnakeGameOnboarding open={showOnboarding} onStart={handleStartGame} />
+			)}
+			{!showOnboarding && (
+				<div className="min-h-screen bg-gradient-to-br from-purple-400 via-pink-300 to-yellow-300 flex items-center justify-center p-4">
+					<div className="w-full max-w-4xl mx-auto">
+						<div className="text-center mb-6">
+							<h1 className="text-4xl font-bold text-white mb-2">🐍 Prompt the Python</h1>
+							<div className="bg-white rounded-2xl p-4 shadow-lg">
+								<h2 className="text-xl font-bold text-purple-800">
+									Level {currentLevel + 1}: {LEVELS[currentLevel].title}
+								</h2>
+								<p className="text-purple-600">{LEVELS[currentLevel].description}</p>
+								<p className="text-sm text-gray-600 mt-2">Goal: {LEVELS[currentLevel].goal}</p>
 							</div>
 						</div>
-					)}
-					<div className="bg-white rounded-2xl p-6 shadow-lg">
-						<div className="grid grid-cols-5 gap-1 mb-4 max-w-xs mx-auto">
-							{Array.from({ length: GRID_SIZE }, (_, y) =>
-								Array.from({ length: GRID_SIZE }, (_, x) => renderCell(x, y))
-							)}
-						</div>
-						<div className="flex justify-between items-center">
-							<div className="flex items-center gap-2">
-								<Star className="w-5 h-5 text-yellow-500" />
-								<span className="font-bold">Score: {score}</span>
-							</div>
-							{inventory.length > 0 && (
-								<div className="flex items-center gap-2">
-									<span className="text-sm">Keys: </span>
-									{inventory.map((key, i) => (
-										<div key={i} className={`w-6 h-6 bg-${key.color || 'gray'}-300 rounded`}>
-											🗝️
-										</div>
-									))}
+						<div className="grid md:grid-cols-2 gap-6">
+							{feedback && (
+								<div className="md:col-span-2">
+									<div
+										className={`p-4 rounded-xl text-center ${
+											isCorrect ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'
+										}`}
+									>
+										<p className="font-medium text-lg">{feedback}</p>
+									</div>
 								</div>
 							)}
-						</div>
-					</div>
-					<div className="bg-white rounded-2xl p-6 shadow-lg">
-						<h3 className="text-lg font-bold text-purple-800 mb-4">Give the Snake Instructions:</h3>
-						<div className="mb-4">
-							<div className="flex gap-2">
-								<input
-									type="text"
-									value={prompt}
-									onChange={(e) => setPrompt(e.target.value)}
-									onKeyPress={(e) => e.key === 'Enter' && handleSubmit()}
-									placeholder="Type your complete instruction..."
-									className="flex-1 p-3 border-2 border-purple-200 rounded-xl focus:border-purple-400 outline-none text-lg"
-								/>
-								<button
-									onClick={handleSubmit}
-									className="bg-green-500 text-white px-6 py-3 rounded-xl font-bold hover:bg-green-600 transition-colors"
-								>
-									Go!
-								</button>
+							<div className="bg-white rounded-2xl p-6 shadow-lg">
+								<div className="grid grid-cols-5 gap-1 mb-4 max-w-xs mx-auto">
+									{Array.from({ length: GRID_SIZE }, (_, y) =>
+										Array.from({ length: GRID_SIZE }, (_, x) => renderCell(x, y))
+									)}
+								</div>
+								<div className="flex justify-between items-center">
+									<div className="flex items-center gap-2">
+										<Star className="w-5 h-5 text-yellow-500" />
+										<span className="font-bold">Score: {score}</span>
+									</div>
+									{inventory.length > 0 && (
+										<div className="flex items-center gap-2">
+											<span className="text-sm">Keys: </span>
+											{inventory.map((key, i) => (
+												<div key={i} className={`w-6 h-6 bg-${key.color || 'gray'}-300 rounded`}>
+													🗝️
+												</div>
+											))}
+										</div>
+									)}
+								</div>
 							</div>
-						</div>
-						<div className="flex gap-2">
-							<button
-								onClick={resetLevel}
-								className="flex items-center gap-2 bg-gray-500 text-white px-4 py-2 rounded-xl hover:bg-gray-600 transition-colors"
-							>
-								<RotateCcw className="w-4 h-4" />
-								Reset
-							</button>
-							{gameState === 'won' && (
-								<button
-									onClick={nextLevel}
-									className="flex-1 bg-purple-500 text-white px-4 py-2 rounded-xl font-bold hover:bg-purple-600 transition-colors"
-								>
-									{currentLevel < LEVELS.length - 1 ? 'Next Level' : 'Finish Game'}
-								</button>
-							)}
+							<div className="bg-white rounded-2xl p-6 shadow-lg">
+								<h3 className="text-lg font-bold text-purple-800 mb-4">Give the Snake Instructions:</h3>
+								<div className="mb-4">
+									<div className="flex gap-2">
+										<input
+											type="text"
+											value={prompt}
+											onChange={(e) => setPrompt(e.target.value)}
+											onKeyPress={(e) => e.key === 'Enter' && handleSubmit()}
+											placeholder="Type your complete instruction..."
+											className="flex-1 p-3 border-2 border-purple-200 rounded-xl focus:border-purple-400 outline-none text-lg"
+										/>
+										<button
+											onClick={handleSubmit}
+											className="bg-green-500 text-white px-6 py-3 rounded-xl font-bold hover:bg-green-600 transition-colors"
+										>
+											Go!
+										</button>
+									</div>
+								</div>
+								<div className="flex gap-2">
+									<button
+										onClick={resetLevel}
+										className="flex items-center gap-2 bg-gray-500 text-white px-4 py-2 rounded-xl hover:bg-gray-600 transition-colors"
+									>
+										<RotateCcw className="w-4 h-4" />
+										Reset
+									</button>
+									{gameState === 'won' && (
+										<button
+											onClick={nextLevel}
+											className="flex-1 bg-purple-500 text-white px-4 py-2 rounded-xl font-bold hover:bg-purple-600 transition-colors"
+										>
+											{currentLevel < LEVELS.length - 1 ? 'Next Level' : 'Finish Game'}
+										</button>
+									)}
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
-			</div>
-		</div>
+			)}
+		</>
 	);
 }
 
